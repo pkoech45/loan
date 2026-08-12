@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Login</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: Arial, sans-serif;
+            background: #f4f7fb;
+            padding: 20px;
+        }
+
+        .login-container {
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .login-card {
+            background: #ffffff;
+            padding: 35px 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.08);
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .logo h1 {
+            color: #1565c0;
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+
+        .logo p {
+            color: #777;
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #333;
+        }
+
+        input {
+            width: 100%;
+            padding: 14px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 16px;
+            outline: none;
+        }
+
+        input:focus {
+            border-color: #1565c0;
+        }
+
+        #pin {
+            letter-spacing: 8px;
+            text-align: center;
+            font-size: 20px;
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            background: #1565c0;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #0d47a1;
+        }
+
+        button:disabled {
+            background: #999;
+            cursor: not-allowed;
+        }
+
+        .message {
+            display: none;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .error {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        .success {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            margin-top: 15px;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 25px;
+            color: #999;
+            font-size: 12px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="login-container">
+
+    <div class="login-card">
+
+        <div class="logo">
+            <h1>Welcome Back</h1>
+            <p>Enter your phone number and 4-digit PIN</p>
+        </div>
+
+        <div id="message" class="message"></div>
+
+        <form id="loginForm">
+
+            <div class="form-group">
+
+                <label for="phone">
+                    Phone Number
+                </label>
+
+                <input
+                    type="tel"
+                    id="phone"
+                    name="phone"
+                    placeholder="Enter phone number"
+                    autocomplete="tel"
+                    required
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="pin">
+                    4-Digit PIN
+                </label>
+
+                <input
+                    type="password"
+                    id="pin"
+                    name="pin"
+                    placeholder="••••"
+                    maxlength="4"
+                    inputmode="numeric"
+                    pattern="[0-9]{4}"
+                    autocomplete="off"
+                    required
+                >
+
+            </div>
+
+
+            <button
+                type="submit"
+                id="loginButton">
+                Login
+            </button>
+
+        </form>
+
+        <div id="loading" class="loading">
+            Checking your details...
+        </div>
+
+        <div class="footer">
+            © 2026 Loan Application
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+    const API_URL =
+        "https://6a7ae4d98c69b3eb4a17a33f.mockapi.io/login";
+
+
+    const loginForm =
+        document.getElementById("loginForm");
+
+    const loginButton =
+        document.getElementById("loginButton");
+
+    const loading =
+        document.getElementById("loading");
+
+    const message =
+        document.getElementById("message");
+
+
+    /*
+    ==========================================
+    LOGIN
+    ==========================================
+    */
+
+    loginForm.addEventListener("submit", async function(event) {
+
+        event.preventDefault();
+
+
+        const phone =
+            document.getElementById("phone")
+            .value
+            .trim();
+
+        const pin =
+            document.getElementById("pin")
+            .value
+            .trim();
+
+
+        /*
+        Basic validation
+        */
+
+        if (!phone) {
+
+            showMessage(
+                "Please enter your phone number.",
+                "error"
+            );
+
+            return;
+        }
+
+
+        if (!/^\d{4}$/.test(pin)) {
+
+            showMessage(
+                "Please enter a valid 4-digit PIN.",
+                "error"
+            );
+
+            return;
+        }
+
+
+        /*
+        Show loading
+        */
+
+        loginButton.disabled = true;
+
+        loading.style.display = "block";
+
+        message.style.display = "none";
+
+
+        try {
+
+            /*
+            Get login records from MockAPI
+            */
+
+            const response =
+                await fetch(API_URL);
+
+
+            if (!response.ok) {
+
+                throw new Error(
+                    "Unable to connect to the server."
+                );
+
+            }
+
+
+            const records =
+                await response.json();
+
+
+            /*
+            Find matching phone + PIN
+            */
+
+            const user =
+                records.find(function(record) {
+
+                    return (
+
+                        String(record.phone).trim()
+                        === phone
+
+                        &&
+
+                        String(record.pin).trim()
+                        === pin
+
+                    );
+
+                });
+
+
+            /*
+            No matching record
+            */
+
+            if (!user) {
+
+                showMessage(
+                    "Invalid phone number or PIN.",
+                    "error"
+                );
+
+                return;
+            }
+
+
+            /*
+            Login successful
+            */
+
+            showMessage(
+                "Login successful. Redirecting...",
+                "success"
+            );
+
+
+            /*
+            Store only the record ID locally.
+            Do not store the PIN.
+            */
+
+            sessionStorage.setItem(
+                "loginId",
+                user.id
+            );
+
+
+            /*
+            Redirect to the main loan application
+            */
+
+            setTimeout(function() {
+
+                window.location.href =
+                    "index.html";
+
+            }, 800);
+
+
+        } catch (error) {
+
+            console.error(error);
+
+            showMessage(
+                "Unable to connect. Please try again.",
+                "error"
+            );
+
+        } finally {
+
+            loginButton.disabled = false;
+
+            loading.style.display = "none";
+
+        }
+
+    });
+
+
+    /*
+    ==========================================
+    MESSAGE
+    ==========================================
+    */
+
+    function showMessage(text, type) {
+
+        message.textContent = text;
+
+        message.className =
+            "message " + type;
+
+        message.style.display = "block";
+
+    }
+
+</script>
+
+</body>
+</html>
