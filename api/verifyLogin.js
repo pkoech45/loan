@@ -78,20 +78,15 @@ try {
      * Compare the submitted phone number
      * with the application phone.
      */
-    const submittedPhone =
-        String(phone).replace(/\D/g, "");
+   const submittedPhone = normalizeZimbabwePhone(phone);
+const storedPhone = normalizeZimbabwePhone(application.phone);
 
-    const storedPhone =
-        String(application.phone || "").replace(/\D/g, "");
-
-    if (submittedPhone !== storedPhone) {
-
-        return res.status(401).json({
-            success: false,
-            message: "Phone number does not match the application."
-        });
-
-    }
+if (submittedPhone !== storedPhone) {
+    return res.status(401).json({
+        success: false,
+        message: "Phone number does not match the application."
+    });
+}
 
     /*
      * The approved application should contain
